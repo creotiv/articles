@@ -5,7 +5,7 @@
 
 ### SOCIAL ENGINEERING
 
-- [Phishing](Hacking/Social Engineering/Phishing.md)
+- [Phishing](Hacking/Social%20Engineering/Phishing.md)
 
 ## DEVOPS
 
@@ -16,4 +16,4 @@
 
 ### IMAGES & CONTAINERS
 
-- [How to make linux kernel with Nasm, Go binary, mini linux](DevOps/Images & Containers/How to make linux kernel with Nasm, Go binary, mini linux.md)
+- [How to make linux kernel with Nasm, Go binary, mini linux](DevOps/Images%20&%20Containers/How%20to%20make%20linux%20kernel%20with%20Nasm,%20Go%20binary,%20mini%20linux.md)

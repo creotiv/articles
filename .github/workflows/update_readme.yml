@@ -1,0 +1,63 @@
+name: Update README with Structured Directory Listings
+
+on:
+  push:
+    branches:
+      - main # Adjust if your default branch has a different name
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Update README with Directory Structure
+        run: |
+          MAIN_README="./README.md"
+          echo "# Articles" > "$MAIN_README"
+
+          # Recursive function to process directories
+          process_directory() {
+              local directory=$1
+              local indent_level=$2
+              local prefix=""
+
+              # Create indent based on the directory level
+              for ((i=0; i<indent_level; i++)); do
+                  prefix+="#"
+              done
+
+              # Avoid printing root directory title (.)
+              if [ "$directory" != "." ]; then
+                  # Convert directory path to title
+                  local title=$(basename "$directory")
+                  title="${title//_/ }"
+                  title="${title//-/ }"
+                  echo -e "\n$prefix $title\n" | awk '{print toupper($0)}' >> "$MAIN_README"
+              fi
+
+              # Find and list all .md files in the current directory, excluding subdirectories
+              local md_files=($(find "$directory" -maxdepth 1 -type f -name '*.md' ! -name 'README.md'))
+              for md_file in "${md_files[@]}"; do
+                  local name=$(basename "$md_file" .md)
+                  name="${name//_/ }"
+                  name="${name//-/ }"
+                  local relpath="${md_file#./}" # Remove leading ./
+                  echo "- [${name^}]($relpath)" >> "$MAIN_README"
+              done
+
+              # Recurse into subdirectories
+              local subdirs=($(find "$directory" -maxdepth 1 -type d ! -path "$directory"))
+              for subdir in "${subdirs[@]}"; do
+                  process_directory "$subdir" $((indent_level + 1))
+              done
+          }
+
+          # Start processing from the root directory
+          process_directory "." 1
+
+          # Commit and push changes if there are any
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add "$MAIN_README"
+          git commit -m "Updated README with a structured list of markdown files" && git push || echo "No changes to commit"

@@ -9,6 +9,7 @@
 
 ## DEVOPS
 
+- [Test](DevOps/test.md)
 
 ### LOGGING
 

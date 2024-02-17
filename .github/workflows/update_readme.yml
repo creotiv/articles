@@ -37,7 +37,7 @@ jobs:
               fi
 
               # Find and list all .md files in the current directory, excluding subdirectories
-              local md_files=($(find "$directory" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' ! -path '*/.github/*'))
+              local md_files=($(find "$directory" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' ! -path '.github/*'))
               for md_file in "${md_files[@]}"; do
                   local name=$(basename "$md_file" .md)
                   name="${name//_/ }"

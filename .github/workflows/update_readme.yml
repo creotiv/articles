@@ -36,21 +36,19 @@ jobs:
                   echo -e "\n$prefix $title\n" | awk '{print toupper($0)}' >> "$MAIN_README"
               fi
 
-              # Find and list all .md files in the current directory, excluding subdirectories
-              local md_files=($(find "$directory" -maxdepth 1 -type f -name '*.md' ! -name 'README.md'))
-              for md_file in "${md_files[@]}"; do
+              while IFS= read -r -d $'\0' md_file; do
                   local name=$(basename "$md_file" .md)
                   name="${name//_/ }"
                   name="${name//-/ }"
+                  name="${name^}" # Capitalize the first letter
                   local relpath="${md_file#./}" # Remove leading ./
-                  echo "- [${name^}]($relpath)" >> "$MAIN_README"
-              done
-
-              # Recurse into subdirectories
-              local subdirs=($(find "$directory" -maxdepth 1 -type d ! -path "$directory" ! -path '*/.github' ! -path '*/.git'))
-              for subdir in "${subdirs[@]}"; do
+                  echo "- [$name]($relpath)" >> "$MAIN_README"
+              done < <(find "$directory" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' -print0)
+              
+              # Recurse into subdirectories, excluding .github
+              while IFS= read -r -d $'\0' subdir; do
                   process_directory "$subdir" $((indent_level + 1))
-              done
+              done < <(find "$directory" -maxdepth 1 -mindepth 1 -type d ! -path '*/.github' ! -path '*/.git' -print0)
           }
 
           # Start processing from the root directory

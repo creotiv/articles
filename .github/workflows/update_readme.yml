@@ -57,7 +57,7 @@ jobs:
           process_directory "." 1
 
           # Commit and push changes if there are any
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
+          git config --local user.name actions-user
+          git config --local user.email "actions@github.com"
           git add "$MAIN_README"
           git commit -m "Updated README with a structured list of markdown files" && git push || echo "No changes to commit"

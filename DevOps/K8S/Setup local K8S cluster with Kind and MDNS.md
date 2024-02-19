@@ -93,11 +93,13 @@ sudo systemctl start mdns-publisher.service
 ```
 
 **Set MDNS support on client and server**:
+
 `resolvectl mdns _your_network_intface yes`
 
 **Check that domains working**
 
 `ping service1._your_machine_hostname_.local`
+
 `nslookup service1._your_machine_hostname_.local`
 
 ### Setup Kind
@@ -131,6 +133,16 @@ nodes:
 `kind create cluster --config=kind.config.yml`
 
 Use `kubectl cluster-info ...` from output to check
+
+**!!!If you are using another machine to connect**
+Add insecure tls (this is dev server it simpler then add tls)
+```
+- cluster:
+    insecure-skip-tls-verify: true
+```
+and comment
+
+`#certificate-authority-data`
 
 ### Setup Lens
 

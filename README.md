@@ -10,6 +10,10 @@
 ## DEVOPS
 
 
+### K8S
+
+- [Setup local K8S cluster with Kind and MDNS](DevOps/K8S/Setup%20local%20K8S%20cluster%20with%20Kind%20and%20MDNS.md)
+
 ### LOGGING
 
 - [Logging sampling to reduce costs](DevOps/Logging/Logging_sampling_to_reduce_costs.md)

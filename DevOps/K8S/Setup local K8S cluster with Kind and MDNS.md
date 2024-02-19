@@ -92,9 +92,13 @@ sudo systemctl enable mdns-publisher
 sudo systemctl start mdns-publisher.service
 ```
 
+**Set MDNS support on client and server**:
+`resolvectl mdns _your_network_intface yes`
+
 **Check that domains working**
 
 `ping service1._your_machine_hostname_.local`
+`nslookup service1._your_machine_hostname_.local`
 
 ### Setup Kind
 **Add cluster config `kind.config.yml`:**

@@ -122,3 +122,12 @@ nodes:
   image: kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245
 ```
 
+**Create cluster:**
+
+`kind create cluster --config=kind.config.yml`
+
+Use `kubectl cluster-info ...` from output to check
+
+### Setup Lens
+
+Run to get kubeconfig `kind get kubeconfig --name _your_cluster_name`

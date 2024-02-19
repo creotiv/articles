@@ -3,8 +3,9 @@
 ## Requirements
 1. [Install Docker](https://docs.docker.com/engine/install/ubuntu/)
 2. [install Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-3. `sudo apt install avahi-utils inotify-tools`
-4. `pip install mdns-publisher`
+3. [Instal K8S tools](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+4. `sudo apt install avahi-utils inotify-tools`
+5. `pip install mdns-publisher`
 
 ## Setup cluster
 ### Add MDNS domains

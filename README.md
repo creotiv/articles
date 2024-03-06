@@ -25,3 +25,7 @@
 ### IMAGES & CONTAINERS
 
 - [How to make linux kernel with Nasm, Go binary, mini linux](DevOps/Images%20&%20Containers/How%20to%20make%20linux%20kernel%20with%20Nasm,%20Go%20binary,%20mini%20linux.md)
+
+### NETWORKING
+
+- [Setup local dns with mDNS](DevOps/Networking/setup_local_dns_with_mDNS.md)

@@ -21,6 +21,7 @@
 #### NETWORKING
 
 - [Connection issues on pod moving](DevOps/K8S/Networking/connection_issues_on_pod_moving.md)
+- [Package routing inside the k8s](DevOps/K8S/Networking/package_routing_inside_the_k8s.md)
 - [How to make real zero downtime update in k8s](DevOps/K8S/Networking/How_to_make_real_zero_downtime_update_in_k8s.md)
 
 ### IMAGES & CONTAINERS

@@ -70,4 +70,61 @@ sudo ip netns exec ns_pod python -m http.server --bind 10.1.1.1 8000
 sudo ip netns exec ns_pod curl 10.1.1.1
 ```
 
+## 2 pods, one node: connecting container in pod1 to the container in pod2
+```bash
+[ns_pod1:10.0.0.1]                 [ns_pod2:10.0.0.2]
+     |                                         |
+[veth_pod1]                               [veth_pod2]
+     |                                         |
+     ---[brveth_pod1]<->[br1]<->[brveth_pod2]---
+                          |
+                  [External Network]
+                          |
+                     [wlo1: NAT]
+```
+All this setup repeating previous one, we just connecting another pod in the same way
+```bash
+sudo ip netns add ns_pod1
+sudo ip netns add ns_pod2
+```
+```bash
+sudo ip link add br1 type bridge
+sudo ip link set br1 up
+```
+```bash
+sudo ip link add veth_pod1 type veth peer name brveth_pod1
+sudo ip link set veth_pod1 netns ns_pod1
+sudo ip link set brveth_pod1 master br1
+sudo ip link set brveth_pod1 up
+```
+```bash
+sudo ip link add veth_pod2 type veth peer name brveth_pod2
+sudo ip link set veth_pod2 netns ns_pod2
+sudo ip link set brveth_pod2 master br1
+sudo ip link set brveth_pod2 up
+```
+```bash
+sudo ip netns exec ns_pod1 ip addr add 10.0.0.1/24 dev veth_pod1
+sudo ip netns exec ns_pod1 ip link set veth_pod1 up
+sudo ip netns exec ns_pod1 ip link set lo up
+```
+```bash
+sudo ip netns exec ns_pod2 ip addr add 10.0.0.2/24 dev veth_pod2
+sudo ip netns exec ns_pod2 ip link set veth_pod2 up
+sudo ip netns exec ns_pod2 ip link set lo up
+```
+```bash
+# enable routing
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo iptables -t nat -A POSTROUTING -o wlo1 -j MASQUERADE
+```
+Adding routing between pods in iptables rules
+```bash
+# this needed so we can forward packages from one NS(pod) to another
+sudo iptables -A FORWARD -i brveth_pod1 -o brveth_pod2 -j ACCEPT
+sudo iptables -A FORWARD -i brveth_pod2 -o brveth_pod1 -j ACCEPT
+```
+```bash
+sudo ip netns exec ns_pod1 ping 10.0.0.2
+```
 

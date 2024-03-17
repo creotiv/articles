@@ -128,3 +128,84 @@ sudo iptables -A FORWARD -i brveth_pod2 -o brveth_pod1 -j ACCEPT
 sudo ip netns exec ns_pod1 ping 10.0.0.2
 ```
 
+## 2 nodes, 2 pods, 2 containers
+
+```bash
+┌─────────────────────────────────┐             ┌─────────────────────────────────┐
+│   NS                            │             │   NS                            │
+│                                 │             │                                 │
+│  ┌────────────┐ ┌────────────┐  │             │  ┌────────────┐ ┌────────────┐  │
+│  │            │ │            │  │             │  │            │ │            │  │
+│  │            │ │            │  │             │  │            │ │            │  │
+│  │   POD1     │ │   POD2     │  │             │  │   POD1     │ │   POD2     │  │
+│  │            │ │            │  │             │  │            │ │            │  │
+│  └────────┬───┘ └─────┬──────┘  │             │  └────────┬───┘ └─────┬──────┘  │
+│           │           │         │             │           │           │         │
+└───────────┼───────────┼─────────┘             └───────────┼───────────┼─────────┘
+            │    VETH   │                                   │    VETH   │          
+            │           │                                   │           │          
+         ┌──┴───────────┴┐                               ┌──┴───────────┴┐         
+         │               │                               │               │         
+         │    BRIDGE     │                               │    BRIDGE     │         
+         └────────┬──────┘                               └────────┬──────┘         
+                  │                                               │                
+                  │                                               │                
+                  │                                               │                
+             ┌────┴───┐                                      ┌────┴───┐            
+             │        ├──────────────────────────────────────┤        │            
+             │  ETH   │                                      │  ETH   │            
+             └────────┘                                      └────────┘            
+````
+
+Basically we have the same setup like in previous post, as we just adding one more node. But we additionally added bridge ip and routing `pod<->bridge<->interface<->additional nodes`
+
+### On the 1st Node
+```bash
+sudo ip netns add ns_pod
+sudo ip link add name br0 type bridge
+sudo ip link set br0 up
+sudo ip link add veth_pod type veth peer name brveth_pod
+sudo ip link set brveth_pod master br0
+sudo ip link set brveth_pod up
+sudo ip link set veth_pod netns ns_pod
+sudo ip netns exec ns_pod ip addr add 10.1.1.2/24 dev veth_pod
+sudo ip netns exec ns_pod ip link set veth_pod up
+sudo ip netns exec ns_pod ip link set lo up
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo iptables -t nat -A POSTROUTING -o wlo1 -j MASQUERADE
+# Adding routing to second node
+sudo ip route add 10.1.2.0/24 via <Node 2 IP>
+# Adding bridge ip 
+sudo ip addr add 10.1.1.1/24 dev br0
+# Adding default routing through the bridge
+sudo ip netns exec ns_pod ip route add default via 10.1.1.1
+# Forward for bridge<->interface
+sudo iptables -A FORWARD -i wlo1 -o br0 -j ACCEPT
+sudo iptables -A FORWARD -i br0 -o wlo1 -j ACCEPT
+```
+
+### On the 2nd Node
+```bash
+sudo ip netns add ns_pod
+sudo ip link add name br0 type bridge
+sudo ip link set br0 up
+sudo ip link add veth_pod type veth peer name brveth_pod
+sudo ip link set brveth_pod master br0
+sudo ip link set brveth_pod up
+sudo ip link set veth_pod netns ns_pod
+sudo ip netns exec ns_pod ip addr add 10.1.2.2/24 dev veth_pod
+sudo ip netns exec ns_pod ip link set veth_pod up
+sudo ip netns exec ns_pod ip link set lo up
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo iptables -t nat -A POSTROUTING -o wlo1 -j MASQUERADE
+# Adding routing to second node
+sudo ip route add 10.1.1.0/24 via <Node 1 IP>
+# Adding bridge ip 
+sudo ip addr add 10.1.2.1/24 dev br0
+# Adding default routing through the bridge
+sudo ip netns exec ns_pod ip route add default via 10.1.2.1
+# Forward for bridge<->interface
+sudo iptables -A FORWARD -i wlo1 -o br0 -j ACCEPT
+sudo iptables -A FORWARD -i br0 -o wlo1 -j ACCEPT
+```
+

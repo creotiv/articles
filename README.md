@@ -14,6 +14,7 @@
 ### K8S
 
 - [Setup local K8S cluster with Kind and MDNS](DevOps/K8S/Setup%20local%20K8S%20cluster%20with%20Kind%20and%20MDNS.md)
+- [Configuration update without redeploying the service](DevOps/K8S/Configuration_update_without_redeploying_the_service.md)
 
 #### NETWORKING
 
